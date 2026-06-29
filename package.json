@@ -1,0 +1,316 @@
+{
+  "name": "rust-smart-runner",
+  "displayName": "Rust Smart Runner",
+  "description": "Run, debug, and copy Cargo commands for Rust runnable targets with workspace-aware Cargo.toml resolution and diagnostics.",
+  "version": "0.2.3",
+  "publisher": "diacinth",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/diacinth/rust-smart-runner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/diacinth/rust-smart-runner/issues"
+  },
+  "homepage": "https://github.com/diacinth/rust-smart-runner#readme",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Debuggers",
+    "Other"
+  ],
+  "keywords": [
+    "rust",
+    "cargo",
+    "debug",
+    "run",
+    "lldb",
+    "codelldb",
+    "workspace",
+    "monorepo",
+    "cargo workspace",
+    "runner",
+    "rust tools"
+  ],
+  "galleryBanner": {
+    "color": "#1E1E1E",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "preview": false,
+  "activationEvents": [
+    "onLanguage:rust",
+    "onCommand:rustSmartRunner.runRust",
+    "onCommand:rustSmartRunner.debugRust",
+    "onCommand:rustSmartRunner.copyCargoCommand",
+    "onCommand:rustSmartRunner.refreshMetadataCache",
+    "onCommand:rustSmartRunner.revealResolvedTarget",
+    "onCommand:rustSmartRunner.explainManifestResolution",
+    "onCommand:rustSmartRunner.runRustMenu",
+    "onCommand:rustSmartRunner.debugRustMenu",
+    "onCommand:rustSmartRunner.copyCargoCommandMenu"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rustSmartRunner.runRust",
+        "title": "Run Rust",
+        "category": "Rust Smart Runner",
+        "icon": "$(play)"
+      },
+      {
+        "command": "rustSmartRunner.debugRust",
+        "title": "Debug Rust",
+        "category": "Rust Smart Runner",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "rustSmartRunner.copyCargoCommand",
+        "title": "Copy Cargo Command",
+        "category": "Rust Smart Runner",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "rustSmartRunner.refreshMetadataCache",
+        "title": "Refresh Metadata Cache",
+        "category": "Rust Smart Runner",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "rustSmartRunner.revealResolvedTarget",
+        "title": "Reveal Resolved Target",
+        "category": "Rust Smart Runner",
+        "icon": "$(search)"
+      },
+      {
+        "command": "rustSmartRunner.explainManifestResolution",
+        "title": "Explain Manifest Resolution",
+        "category": "Rust Smart Runner",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "rustSmartRunner.runRustMenu",
+        "title": "▶ Run Rust",
+        "category": "Rust Smart Runner"
+      },
+      {
+        "command": "rustSmartRunner.debugRustMenu",
+        "title": "🐞 Debug Rust",
+        "category": "Rust Smart Runner"
+      },
+      {
+        "command": "rustSmartRunner.copyCargoCommandMenu",
+        "title": "📋 Copy Cargo Command",
+        "category": "Rust Smart Runner"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "rustSmartRunner.submenu",
+        "label": "Rust Smart Runner",
+        "icon": "$(tools)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "rustSmartRunner.submenu",
+          "when": "editorTextFocus && resourceExtname == .rs",
+          "group": "z_rustsmart@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "submenu": "rustSmartRunner.submenu",
+          "when": "resourceExtname == .rs",
+          "group": "z_rustsmart@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "rustSmartRunner.runRust",
+          "when": "resourceExtname == .rs && rustSmartRunner.isRunnableTarget",
+          "group": "navigation@100"
+        },
+        {
+          "command": "rustSmartRunner.debugRust",
+          "when": "resourceExtname == .rs && rustSmartRunner.isRunnableTarget",
+          "group": "navigation@101"
+        },
+        {
+          "command": "rustSmartRunner.copyCargoCommand",
+          "when": "resourceExtname == .rs && rustSmartRunner.isRunnableTarget",
+          "group": "navigation@102"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "rustSmartRunner.runRust"
+        },
+        {
+          "command": "rustSmartRunner.debugRust"
+        },
+        {
+          "command": "rustSmartRunner.copyCargoCommand"
+        },
+        {
+          "command": "rustSmartRunner.refreshMetadataCache"
+        },
+        {
+          "command": "rustSmartRunner.revealResolvedTarget"
+        },
+        {
+          "command": "rustSmartRunner.explainManifestResolution"
+        }
+      ],
+      "rustSmartRunner.submenu": [
+        {
+          "command": "rustSmartRunner.runRustMenu",
+          "group": "1_run@1"
+        },
+        {
+          "command": "rustSmartRunner.debugRustMenu",
+          "group": "1_run@2"
+        },
+        {
+          "command": "rustSmartRunner.copyCargoCommandMenu",
+          "group": "1_run@3"
+        },
+        {
+          "command": "rustSmartRunner.revealResolvedTarget",
+          "group": "2_info@1"
+        },
+        {
+          "command": "rustSmartRunner.explainManifestResolution",
+          "group": "2_info@2"
+        },
+        {
+          "command": "rustSmartRunner.refreshMetadataCache",
+          "group": "2_info@3"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Rust Smart Runner",
+      "properties": {
+        "rustSmartRunner.cargoPath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional absolute path to cargo executable. If empty, cargo will be resolved from system PATH."
+        },
+        "rustSmartRunner.cargoCommandArgs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Arguments inserted between cargo and the subcommand. Example: ['+nightly']."
+        },
+        "rustSmartRunner.cargoSubcommandArgs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Arguments inserted after the cargo subcommand. Example: ['--release']."
+        },
+        "rustSmartRunner.cargoExtraArgs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Legacy compatibility setting. If cargoCommandArgs and cargoSubcommandArgs are empty, this value will be treated as cargoCommandArgs."
+        },
+        "rustSmartRunner.runArgs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Arguments passed to the target program after '--'."
+        },
+        "rustSmartRunner.env": {
+          "type": "object",
+          "default": {},
+          "description": "Environment variables used for run/debug."
+        },
+        "rustSmartRunner.autoSaveBeforeRun": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically save the active file before running or debugging."
+        },
+        "rustSmartRunner.requireMainRsOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, only allow commands on files named main.rs."
+        },
+        "rustSmartRunner.revealOutputOnError": {
+          "type": "boolean",
+          "default": true,
+          "description": "Reveal the output channel when an error occurs."
+        },
+        "rustSmartRunner.showStatusBarButtons": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Run/Debug/Copy status bar buttons for runnable Rust targets."
+        },
+        "rustSmartRunner.metadataCacheTtlMs": {
+          "type": "number",
+          "default": 3000,
+          "minimum": 0,
+          "description": "TTL in milliseconds for cached cargo metadata."
+        },
+        "rustSmartRunner.cargoValidationCacheTtlMs": {
+          "type": "number",
+          "default": 10000,
+          "minimum": 0,
+          "description": "TTL in milliseconds for cached cargo executable validation."
+        },
+        "rustSmartRunner.uiRefreshDebounceMs": {
+          "type": "number",
+          "default": 120,
+          "minimum": 0,
+          "description": "Debounce time in milliseconds for refreshing UI state."
+        },
+        "rustSmartRunner.debugLogging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable verbose debug logging in the output channel."
+        },
+        "rustSmartRunner.manifestSelectionStrategy": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "nearest",
+            "workspaceRoot"
+          ],
+          "default": "auto",
+          "description": "Strategy used to select Cargo.toml in workspace and monorepo scenarios."
+        },
+        "rustSmartRunner.addPackageArgInWorkspaceRoot": {
+          "type": "boolean",
+          "default": true,
+          "description": "When using a workspace root manifest, automatically add '-p <package>' for member targets."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish:vsce": "vsce publish",
+    "prepublishOnly": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.2",
+    "typescript": "^5.3.3"
+  }
+}
